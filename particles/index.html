@@ -1,0 +1,48 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./index.css">
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.10.2/p5.js"></script> -->
+  <!-- <script src="./p5.min.js"></script> -->
+  <script src="./matter-js/matter.min.js"></script>
+
+  <title>Matter JS - contagion simulation</title>
+</head>
+<body>
+
+  <div id="app">
+    <div class="simulation">
+      <pre class="dump"></pre>
+      <div class="chartContainer">
+        <div class="chart"></div>
+        <hr />
+      </div>
+      <div id="matter">
+      </div>
+  
+    </div>
+    <div class="controls">
+      <h2>Simulation settings</h2>
+      <div id="distancing" class="setting">
+        <label for="distancing">Social distancing: <span></span></label>
+        <input data-type="distancing" type="range" min="0" max="90" />
+      </div>
+
+      <div id="infectionLength" class="setting">
+        <label for="infectionLength">Time infection lasts for: <span></span></label>
+        <input data-type="infectionLength" type="range" min="5" max="10" />
+      </div>
+
+      <div id="simulationLength" class="setting">
+        <label for="simulationLength">Simulation length: <span></span></label>
+        <input data-type="simulationLength" type="range" min="5" max="30" />
+      </div>
+
+      <button id="start">Start simulation</button>
+    </div>
+  </div>
+  
+  <script src="./index.js"></script>
+</body>
+</html>
