@@ -18,7 +18,7 @@ canvas {
   position: relative;
   width: 100vw;
   max-width: 1200px;
-  margin: 0 auto
+  margin: 0 auto;
   flex-wrap: wrap;
 }
 
@@ -33,7 +33,8 @@ canvas {
 .chartContainer {
   position: relative;
 }
-.chartContainer hr {
+.chartContainer hr.expectedDead {
+  display: none;
   position: absolute;
   top: 0;
   left: 0;
