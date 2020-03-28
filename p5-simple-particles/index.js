@@ -1,16 +1,20 @@
+// Configurable options
 const population = 50
 const speed = 2
 const diameter = 9
+const timeToCure = 5 * 1000 // (ms)
+const simulationLength = 10 * 1000 // (ms)
+const distancing = 0.6 // (pct of population that does not move)
+const sessionTick = 100 // How often does the chart update (ms)
+
+// System variables
 const people = []
-const timeToCure = 5 * 1000
 let normalTotal = population
 let infectedTotal = 0
 let curedTotal = 0
 let deadTotal = 0
 let running = true
-const simulationLength = 10 * 1000
 let sessionTime = 0
-const distancing = 0.6
 
 const dump = document.querySelector('pre.dump')
 const chartContainer = document.querySelector('div.chart')
@@ -25,9 +29,8 @@ function barTemplate () {
     --><div class="chart__bar--section dead" style="height: ${deadTotal && deadTotal / population * 100}px" ></div><!--
   --></div>`
 }
-const tick = 100
 function updateChart () {
-  sessionTime += tick
+  sessionTime += sessionTick
   if (sessionTime > simulationLength) {
     running = false
     return
@@ -36,7 +39,7 @@ function updateChart () {
   chartContainer.innerHTML = chart.join('')
   setTimeout(() => {
     window.requestAnimationFrame(updateChart)
-  }, tick)
+  }, sessionTick)
 }
 window.requestAnimationFrame(updateChart)
 
