@@ -1,15 +1,16 @@
-// Configurable options
+// ? Configurable options
 const population = 100
 const speed = 2.5
 const diameter = 5
 const timeToCure = 8 * 1000 // (ms)
 // const timeToKill = 8 * 1000 // (ms)
 const mortality = 0.2 // (pct)
-const simulationLength = 10 * 1000 // (ms)
+const simulationLength = 30 * 1000 // (ms)
 let distancing = 0 // (pct of population that does not move)
 const sessionTick = 500 // How often does the chart update (ms)
 
-// System variables
+
+// ? System/session variables
 let people = []
 const totals = {
   normal: population,
@@ -20,6 +21,8 @@ const totals = {
 let running = true
 let sessionTime = 0
 
+
+// ? UI elments
 const dump = document.querySelector('pre.dump')
 const chartContainer = document.querySelector('div.chart')
 const maxDeadLine = document.querySelector('.chartContainer hr.expectedDead')
@@ -42,7 +45,7 @@ inputs.distancing.addEventListener('change', setDistancing)
 
 maxDeadLine.style.top = `${chartContainer.offsetHeight - (chartContainer.offsetHeight * mortality)}px`
 
-const chart = []
+let chart = []
 function barTemplate () {
   return `<div class="chart__bar"><!--
     --><div class="chart__bar--section cured" style="height: ${totals.cured && totals.cured / population * 100}px" ></div><!--
@@ -51,6 +54,7 @@ function barTemplate () {
     --><div class="chart__bar--section dead" style="height: ${totals.dead && totals.dead / population * 100}px" ></div><!--
   --></div>`
 }
+
 function updateChart () {
   if (!running) return
   sessionTime += sessionTick
@@ -64,7 +68,8 @@ function updateChart () {
     window.requestAnimationFrame(updateChart)
   }, sessionTick)
 }
-window.requestAnimationFrame(updateChart)
+// ! only call on simulation start
+// window.requestAnimationFrame(updateChart)
 
 
 class Person {
@@ -245,6 +250,8 @@ function draw () {
     infected: totals.infected,
     cured: totals.cured,
     dead: totals.dead,
+    sessionTime,
+    distancing,
   }, null, 2)
 }
 
@@ -255,12 +262,21 @@ function stop () {
   stopButton.style.display = 'none'
 }
 
-function start () {
+function reset () {
   people = []
+  chart = []
+  sessionTime = 0
+  Object.keys(totals).forEach(k => totals[k] = 0)
+  totals.normal = population
   background(0)
+}
+
+function start () {
+  reset()
   createSimulation()
   running = true
   loop()
+  window.requestAnimationFrame(updateChart)
   startButton.style.display = 'none'
   stopButton.style.display = 'block'
 }
