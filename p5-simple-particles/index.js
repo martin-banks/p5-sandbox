@@ -1,16 +1,16 @@
 // Configurable options
-const population = 1000
+const population = 100
 const speed = 2.5
 const diameter = 5
 const timeToCure = 8 * 1000 // (ms)
 // const timeToKill = 8 * 1000 // (ms)
 const mortality = 0.2 // (pct)
-const simulationLength = 20 * 1000 // (ms)
-const distancing = 0 // (pct of population that does not move)
+const simulationLength = 10 * 1000 // (ms)
+let distancing = 0 // (pct of population that does not move)
 const sessionTick = 500 // How often does the chart update (ms)
 
 // System variables
-const people = []
+let people = []
 const totals = {
   normal: population,
   infected: 0,
@@ -23,6 +23,23 @@ let sessionTime = 0
 const dump = document.querySelector('pre.dump')
 const chartContainer = document.querySelector('div.chart')
 const maxDeadLine = document.querySelector('.chartContainer hr.expectedDead')
+const startButton = document.querySelector('button#start')
+const stopButton = document.querySelector('button#stop')
+
+const inputs = {
+  distancing: document.querySelector('#distancing input'),
+}
+
+inputs.distancing.value = distancing * 100
+
+function setDistancing () {
+  const { value } = this
+  distancing = value / 100
+  this.parentElement.querySelector('span').innerText = distancing * 100
+}
+inputs.distancing.addEventListener('change', setDistancing)
+
+
 maxDeadLine.style.top = `${chartContainer.offsetHeight - (chartContainer.offsetHeight * mortality)}px`
 
 const chart = []
@@ -35,6 +52,7 @@ function barTemplate () {
   --></div>`
 }
 function updateChart () {
+  if (!running) return
   sessionTime += sessionTick
   if (sessionTime > simulationLength) {
     running = false
@@ -184,9 +202,8 @@ class Person {
   }
 }
 
-
-function setup () {
-  createCanvas(800, 800)
+function createSimulation () {
+  clear()
   for (let i = 0; i < population; i++) {
     people.push(new Person({
       x: random(width - (diameter * 2)) + (diameter),
@@ -201,16 +218,16 @@ function setup () {
 }
 
 
+function setup () {
+  createCanvas(400, 300)
+  // createSimulation()
+}
+
+
 
 function draw () {
   background(0)
 
-  // people = people
-  //   .sort((a, b) => {
-  //     if (a.order > b.order) return 1
-  //     if (a.order < b.order) return -1
-  //     return 0
-  //   })
   people.forEach(function (person, i) {
     if (running) {
       if (person.moving && person.status !== 'dead'){
@@ -233,6 +250,21 @@ function draw () {
 
 function stop () {
   running = false
+  noLoop()
+  startButton.style.display = 'block'
+  stopButton.style.display = 'none'
 }
 
+function start () {
+  people = []
+  background(0)
+  createSimulation()
+  running = true
+  loop()
+  startButton.style.display = 'none'
+  stopButton.style.display = 'block'
+}
+
+startButton.addEventListener('click', start)
+stopButton.addEventListener('click', stop)
 

@@ -14,6 +14,28 @@
     <hr class="expectedDead" />
   </div>
 
+  <div class="controls">
+    <h2>Simulation settings</h2>
+
+    <div id="distancing" class="setting">
+      <label for="distancing">Social distancing: <span>--</span> percent</label>
+      <input data-type="distancing" type="range" min="0" max="90" />
+    </div>
+
+    <!-- <div id="infectionLength" class="setting">
+      <label for="infectionLength">Time infection lasts for: <span>--</span> seconds</label>
+      <input data-type="infectionLength" type="range" min="3" max="8" />
+    </div> -->
+
+    <!-- <div id="simulationLength" class="setting">
+      <label for="simulationLength">Simulation length: <span>--</span> seconds</label>
+      <input data-type="simulationLength" type="range" min="5" max="30" />
+    </div> -->
+
+    <button id="start">Start new simulation</button>
+    <button id="stop">End simulation</button>
+  </div>
+
   <script src="./index.js"></script>
 </body>
 </html>

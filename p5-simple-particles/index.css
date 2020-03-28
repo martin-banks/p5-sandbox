@@ -108,5 +108,9 @@ input {
   border-bottom: solid 1px black;
   padding-bottom: 20px;
   margin-bottom: 20px;
+}
 
+button#start {}
+button#stop {
+  display: none;
 }
