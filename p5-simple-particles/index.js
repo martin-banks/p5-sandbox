@@ -1,32 +1,37 @@
 // Configurable options
-const population = 50
-const speed = 2
-const diameter = 9
-const timeToCure = 5 * 1000 // (ms)
-const simulationLength = 10 * 1000 // (ms)
-const distancing = 0.6 // (pct of population that does not move)
-const sessionTick = 100 // How often does the chart update (ms)
+const population = 1000
+const speed = 2.5
+const diameter = 5
+const timeToCure = 8 * 1000 // (ms)
+// const timeToKill = 8 * 1000 // (ms)
+const mortality = 0.2 // (pct)
+const simulationLength = 20 * 1000 // (ms)
+const distancing = 0 // (pct of population that does not move)
+const sessionTick = 500 // How often does the chart update (ms)
 
 // System variables
 const people = []
-let normalTotal = population
-let infectedTotal = 0
-let curedTotal = 0
-let deadTotal = 0
+const totals = {
+  normal: population,
+  infected: 0,
+  cured: 0,
+  dead: 0,
+}
 let running = true
 let sessionTime = 0
 
 const dump = document.querySelector('pre.dump')
 const chartContainer = document.querySelector('div.chart')
 const maxDeadLine = document.querySelector('.chartContainer hr.expectedDead')
+maxDeadLine.style.top = `${chartContainer.offsetHeight - (chartContainer.offsetHeight * mortality)}px`
 
 const chart = []
 function barTemplate () {
   return `<div class="chart__bar"><!--
-    --><div class="chart__bar--section cured" style="height: ${curedTotal && curedTotal / population * 100}px" ></div><!--
-    --><div class="chart__bar--section healthy" style="height: ${normalTotal && normalTotal / population * 100}px" ></div><!--
-    --><div class="chart__bar--section infected" style="height: ${infectedTotal && infectedTotal / population * 100}px" ></div><!--
-    --><div class="chart__bar--section dead" style="height: ${deadTotal && deadTotal / population * 100}px" ></div><!--
+    --><div class="chart__bar--section cured" style="height: ${totals.cured && totals.cured / population * 100}px" ></div><!--
+    --><div class="chart__bar--section healthy" style="height: ${totals.normal && totals.normal / population * 100}px" ></div><!--
+    --><div class="chart__bar--section infected" style="height: ${totals.infected && totals.infected / population * 100}px" ></div><!--
+    --><div class="chart__bar--section dead" style="height: ${totals.dead && totals.dead / population * 100}px" ></div><!--
   --></div>`
 }
 function updateChart () {
@@ -57,6 +62,7 @@ class Person {
       x: random(-1, 1) * speed,
       y: random(-1, 1) * speed,
     }
+    this.order = 1
   }
 
   move () {
@@ -79,8 +85,10 @@ class Person {
   }
 
   intersect () {
+    if (this.status === 'dead') return
     for (let i = this.id + 1; i < population; i++) {
       if (this.id === i) return
+      if (people[i].status === 'dead') continue
 
       let distanceX = people[i].position.x - this.position.x
       let distanceY = people[i].position.y - this.position.y
@@ -126,17 +134,19 @@ class Person {
         } else if (this.status === 'normal' && people[i].status === 'infected') {
           this.infected = true
           this.status = 'infected'
+          this.order = 3
           this.infectedTime = new Date().getTime()
-          normalTotal--
-          infectedTotal++
+          totals.normal--
+          totals.infected++
           return
 
         } else if (this.status === 'infected' && people[i].status === 'normal') {
           people[i].infected = true
           people[i].status = 'infected'
+          people[i].order = 3
           people[i].infectedTime = new Date().getTime()
-          normalTotal--
-          infectedTotal++
+          totals.normal--
+          totals.infected++
           return
         }
       }
@@ -146,11 +156,15 @@ class Person {
   statusUpdate () {
     if (this.status === 'normal') return
     if (this.status === 'infected') {
+      const newStatus = random() < mortality ? 'dead' : 'cured'
       if (this.infectedTime && ((this.infectedTime + timeToCure) <= new Date().getTime())) {
-        this.status = 'cured'
+        this.status = newStatus
+        this.order = newStatus === 'dead' ? 0
+          : newStatus === 'cured' ? 2
+            : 1
         this.infected = false
-        infectedTotal--
-        curedTotal++
+        totals.infected--
+        totals[newStatus]++
       }
     }
   }
@@ -160,6 +174,8 @@ class Person {
       fill(255, 0, 0)
     } else if (this.status === 'cured') {
       fill(0, 255, 0)
+    } else if (this.status === 'dead') {
+      fill(50)
     } else {
       fill(255)
     }
@@ -170,37 +186,48 @@ class Person {
 
 
 function setup () {
-  createCanvas(800, 400)
+  createCanvas(800, 800)
   for (let i = 0; i < population; i++) {
     people.push(new Person({
-      x: random(width),
-      y: random(height),
+      x: random(width - (diameter * 2)) + (diameter),
+      y: random(height - (diameter * 2)) + (diameter),
       index: i,
       diameter, // : diameter + (10 * i),
       infected: i < 1,
       status: i < 1 ? 'infected' : 'normal',
-      moving: i < (population * distancing),
+      moving: distancing > 0 ? (i < population - (population * distancing)) : true,
     }))
   }
 }
 
+
+
 function draw () {
   background(0)
+
+  // people = people
+  //   .sort((a, b) => {
+  //     if (a.order > b.order) return 1
+  //     if (a.order < b.order) return -1
+  //     return 0
+  //   })
   people.forEach(function (person, i) {
     if (running) {
-      if (person.moving){
+      if (person.moving && person.status !== 'dead'){
         person.move()
       }
-      person.intersect(i)
+      person.intersect()
       person.statusUpdate()
     }
     person.display(person)
   })
+
   dump.innerText = JSON.stringify({
     population,
-    normalTotal,
-    infectedTotal,
-    curedTotal,
+    normal: totals.normal,
+    infected: totals.infected,
+    cured: totals.cured,
+    dead: totals.dead,
   }, null, 2)
 }
 
