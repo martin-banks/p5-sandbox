@@ -1,16 +1,20 @@
 // ? Configurable options
-const population = 100
-const speed = 2.5
-const diameter = 5
+let population = 500
+let distancing = 0 // (pct of population that does not move)
 const timeToCure = 8 * 1000 // (ms)
+
+const speed = 2.5
 // const timeToKill = 8 * 1000 // (ms)
 const mortality = 0.2 // (pct)
-const simulationLength = 30 * 1000 // (ms)
-let distancing = 0 // (pct of population that does not move)
+const simulationLength = 10 * 1000 // (ms)
 const sessionTick = 500 // How often does the chart update (ms)
 
-
 // ? System/session variables
+const canvas = { // TODO Set from designated area
+  w: 400,
+  h: 400,
+}
+const diameter = Math.round(Math.min(canvas.w, canvas.h) / 100)
 let people = []
 const totals = {
   normal: population,
@@ -31,16 +35,56 @@ const stopButton = document.querySelector('button#stop')
 
 const inputs = {
   distancing: document.querySelector('#distancing input'),
+  population: document.querySelector('#population input'),
+  timeToCure: document.querySelector('#timeToCure input'),
+  mortality: document.querySelector('#mortality input'),
 }
 
-inputs.distancing.value = distancing * 100
 
 function setDistancing () {
   const { value } = this
-  distancing = value / 100
-  this.parentElement.querySelector('span').innerText = distancing * 100
+  if (value) {
+    distancing = value / 100
+  }
+  inputs.distancing.value = distancing * 100
+  inputs.distancing.parentElement.querySelector('span').innerText = distancing * 100
 }
+
+function setPopulation () {
+  const { value } = this
+  if (value) {
+    population = value
+  }
+  inputs.population.value = population
+  inputs.population.parentElement.querySelector('span').innerText = population
+}
+
+function setCure () {
+  const { value } = this
+  if (value) {
+    timeToCure = value * 1000
+  }
+  inputs.timeToCure.value = timeToCure
+  inputs.timeToCure.parentElement.querySelector('span').innerText = timeToCure / 1000
+}
+
+function setMortality () {
+  const { value } = this
+  if (value) {
+    mortality = value
+  }
+  inputs.mortality.value = mortality
+  inputs.mortality.parentElement.querySelector('span').innerText = mortality
+}
+
 inputs.distancing.addEventListener('change', setDistancing)
+inputs.population.addEventListener('change', setPopulation)
+inputs.population.addEventListener('change', setCure)
+
+setDistancing()
+setPopulation()
+setCure()
+setMortality()
 
 
 maxDeadLine.style.top = `${chartContainer.offsetHeight - (chartContainer.offsetHeight * mortality)}px`
@@ -224,35 +268,43 @@ function createSimulation () {
 
 
 function setup () {
-  createCanvas(400, 300)
+  createCanvas(canvas.w, canvas.h)
   // createSimulation()
 }
 
 
 
 function draw () {
-  background(0)
-
-  people.forEach(function (person, i) {
-    if (running) {
-      if (person.moving && person.status !== 'dead'){
-        person.move()
-      }
-      person.intersect()
-      person.statusUpdate()
-    }
-    person.display(person)
-  })
-
-  dump.innerText = JSON.stringify({
-    population,
-    normal: totals.normal,
-    infected: totals.infected,
-    cured: totals.cured,
-    dead: totals.dead,
-    sessionTime,
-    distancing,
-  }, null, 2)
+  
+  if (running) {
+    background(0)
+    people.forEach(function (person, i) {
+        if (person.moving && person.status !== 'dead'){
+          person.move()
+        }
+        person.intersect()
+        person.statusUpdate()
+        person.display(person)
+      })
+      
+      dump.innerText = JSON.stringify({
+        settings: {
+          population,
+          distancing,
+          timeToCure,
+          mortality,
+        },
+        stats: {
+          normal: totals.normal,
+          infected: totals.infected,
+          cured: totals.cured,
+          dead: totals.dead,
+        },
+        sessionTime,
+      }, null, 2)
+  } else {
+    stop()
+  }
 }
 
 function stop () {
