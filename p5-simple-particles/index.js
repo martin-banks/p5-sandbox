@@ -11,8 +11,8 @@ const sessionTick = 500 // How often does the chart update (ms)
 
 // ? System/session variables
 const canvas = { // TODO Set from designated area
-  w: 400,
-  h: 400,
+  w: Math.min(1000, window.innerWidth) - 60, // 400,
+  h: Math.min(1000, window.innerWidth) - 60, // 400,
 }
 const diameter = Math.round(Math.min(canvas.w, canvas.h) / 100)
 let people = []
@@ -22,7 +22,7 @@ const totals = {
   cured: 0,
   dead: 0,
 }
-let running = true
+let running = false
 let sessionTime = 0
 
 
@@ -94,7 +94,7 @@ setCure()
 setMortality()
 
 
-maxDeadLine.style.top = `${chartContainer.offsetHeight - (chartContainer.offsetHeight * mortality)}px`
+// maxDeadLine.style.top = `${chartContainer.offsetHeight - (chartContainer.offsetHeight * mortality)}px`
 
 let chart = []
 function barTemplate () {
@@ -279,10 +279,29 @@ function setup () {
   // createSimulation()
 }
 
+function updateDump () {
+  dump.innerText = JSON.stringify({
+    settings: {
+      population,
+      distancing,
+      timeToCure,
+      mortality,
+    },
+    stats: {
+      normal: totals.normal,
+      infected: totals.infected,
+      cured: totals.cured,
+      dead: totals.dead,
+    },
+    sessionTime,
+  }, null, 2)
+}
+
+updateDump()
+
 
 
 function draw () {
-  
   if (running) {
     background(0)
     people.forEach(function (person, i) {
@@ -293,22 +312,7 @@ function draw () {
         person.statusUpdate()
         person.display(person)
       })
-      
-      dump.innerText = JSON.stringify({
-        settings: {
-          population,
-          distancing,
-          timeToCure,
-          mortality,
-        },
-        stats: {
-          normal: totals.normal,
-          infected: totals.infected,
-          cured: totals.cured,
-          dead: totals.dead,
-        },
-        sessionTime,
-      }, null, 2)
+    updateDump()
   } else {
     stop()
   }

@@ -7,10 +7,37 @@ html, body {
   width: 100vw;
   height: 100vh;
   font-family: sans-serif;
+  font-size: 16px;
+}
+body {
+  padding: 30px;
+  margin-bottom: 30px;
+}
+
+* {
+  box-sizing: border-box;
 }
 canvas {
   display: block;
 }
+
+label, pre, code, button {
+  font-size: 16px
+}
+
+h2 {
+  font-size: 32px;
+}
+
+pre {
+  padding-bottom: 20px;
+  border-bottom: solid 1px lightgrey
+}
+pre, code {
+  color: lightslategray;
+}
+
+
 
 
 /* #app {
@@ -32,17 +59,18 @@ canvas {
 
 .chartContainer {
   position: relative;
-  width: 800px
+  width: 100%;
+  max-width: 800px;
 }
 .chartContainer hr.expectedDead {
-  /* display: none; */
+  display: none;
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 0;
   border: none;
-  border-top: solid 2px black;
+  border-top: solid 1px black;
   text-align: right;
   padding: 0;
   margin: 0;
@@ -52,10 +80,11 @@ canvas {
   content: "Expected max dead";
 }
 .chart {
-  width: 600px;
+  width: 100%;
   height: 100px;
   display: flex;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
+  background: lightblue;
 }
 
 .chart__bar {
@@ -75,7 +104,7 @@ canvas {
 }
 
 .chart__bar--section.healthy {
-  background: lightblue;
+  background: none;
 }
 .chart__bar--section.infected {
   background: darkred;
@@ -90,14 +119,11 @@ canvas {
 
 
 .controls {
-  box-sizing: border-box;
   display: block;
   position: relative;
   flex: 1 1 0;
   max-width: 600px;
-  padding-left: 30px;
-  padding-top: 100px;
-  outline: solid 1px pink
+  margin-bottom: 30px;
 }
 
 input {
@@ -105,12 +131,22 @@ input {
 }
 
 .setting {
-  border-bottom: solid 1px black;
+  border-bottom: solid 1px lightgrey;
   padding-bottom: 20px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
-button#start {}
+
+button {
+  padding: 8px 20px;
+  border: solid 1px lightgrey;
+  background: #e2e2e2;
+  color: black;
+
+}
+
+/* button#start {} */
+
 button#stop {
   display: none;
 }
