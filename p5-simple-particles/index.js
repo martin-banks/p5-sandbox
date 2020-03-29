@@ -1,12 +1,12 @@
 // ? Configurable options
 let population = 500
 let distancing = 0 // (pct of population that does not move)
-const timeToCure = 8 * 1000 // (ms)
+let timeToCure = 8 * 1000 // (ms)
+let mortality = 0.2 // (pct)
 
-const speed = 2.5
+const speed = 2
 // const timeToKill = 8 * 1000 // (ms)
-const mortality = 0.2 // (pct)
-const simulationLength = 10 * 1000 // (ms)
+const simulationLength = 30 * 1000 // (ms)
 const sessionTick = 500 // How often does the chart update (ms)
 
 // ? System/session variables
@@ -43,17 +43,20 @@ const inputs = {
 
 function setDistancing () {
   const { value } = this
+  console.log('setting distancing', inputs.distancing.value, value)
   if (value) {
-    distancing = value / 100
+    distancing = parseInt(value, 10) / 100
+  } else {
+    inputs.distancing.value = distancing * 100
   }
-  inputs.distancing.value = distancing * 100
+  console.log('distancing set', inputs.distancing.value, value, distancing)
   inputs.distancing.parentElement.querySelector('span').innerText = distancing * 100
 }
 
 function setPopulation () {
   const { value } = this
   if (value) {
-    population = value
+    population = parseInt(value, 10)
   }
   inputs.population.value = population
   inputs.population.parentElement.querySelector('span').innerText = population
@@ -62,7 +65,7 @@ function setPopulation () {
 function setCure () {
   const { value } = this
   if (value) {
-    timeToCure = value * 1000
+    timeToCure = parseInt(value, 10) * 1000
   }
   inputs.timeToCure.value = timeToCure
   inputs.timeToCure.parentElement.querySelector('span').innerText = timeToCure / 1000
@@ -71,15 +74,16 @@ function setCure () {
 function setMortality () {
   const { value } = this
   if (value) {
-    mortality = value
+    mortality = parseInt(value, 10) / 100
   }
   inputs.mortality.value = mortality
-  inputs.mortality.parentElement.querySelector('span').innerText = mortality
+  inputs.mortality.parentElement.querySelector('span').innerText = mortality * 100
 }
 
 inputs.distancing.addEventListener('change', setDistancing)
 inputs.population.addEventListener('change', setPopulation)
-inputs.population.addEventListener('change', setCure)
+inputs.timeToCure.addEventListener('change', setCure)
+inputs.mortality.addEventListener('change', setMortality)
 
 setDistancing()
 setPopulation()
