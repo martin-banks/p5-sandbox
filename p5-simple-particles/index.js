@@ -50,34 +50,37 @@ function setDistancing () {
     inputs.distancing.value = distancing * 100
   }
   console.log('distancing set', inputs.distancing.value, value, distancing)
-  inputs.distancing.parentElement.querySelector('span').innerText = distancing * 100
+  inputs.distancing.parentElement.querySelector('span').innerText = Math.round(distancing * 100)
 }
 
 function setPopulation () {
   const { value } = this
   if (value) {
     population = parseInt(value, 10)
+  } else {
+    inputs.population.value = population
   }
-  inputs.population.value = population
-  inputs.population.parentElement.querySelector('span').innerText = population
+  inputs.population.parentElement.querySelector('span').innerText = Math.round(population)
 }
 
 function setCure () {
   const { value } = this
   if (value) {
     timeToCure = parseInt(value, 10) * 1000
+  } else {
+    inputs.timeToCure.value = timeToCure
   }
-  inputs.timeToCure.value = timeToCure
-  inputs.timeToCure.parentElement.querySelector('span').innerText = timeToCure / 1000
+  inputs.timeToCure.parentElement.querySelector('span').innerText = Math.round(timeToCure / 1000)
 }
 
 function setMortality () {
   const { value } = this
   if (value) {
     mortality = parseInt(value, 10) / 100
+  } else {
+    inputs.mortality.value = mortality
   }
-  inputs.mortality.value = mortality
-  inputs.mortality.parentElement.querySelector('span').innerText = mortality * 100
+  inputs.mortality.parentElement.querySelector('span').innerText = Math.round(mortality * 100)
 }
 
 inputs.distancing.addEventListener('change', setDistancing)
